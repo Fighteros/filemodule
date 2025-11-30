@@ -33,6 +33,11 @@ export class DocsModule implements OnModuleInit {
     const doc = SwaggerModule.createDocument(app, config, {
       deepScanRoutes: true,
     });
-    SwaggerModule.setup(`api`, app, doc, { jsonDocumentUrl: `api/json` });
+    SwaggerModule.setup(`api`, app, doc, {
+      jsonDocumentUrl: `api/json`,
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
   }
 }

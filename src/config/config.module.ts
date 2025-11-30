@@ -4,6 +4,9 @@ import appConfig, { appValidationSchema } from './configs/app.config';
 import databaseConfig, {
   databaseValidationSchema,
 } from './configs/database.config';
+import storageConfig, {
+  storageValidationSchema,
+} from './configs/storage.config';
 
 @Module({
   imports: [
@@ -11,9 +14,10 @@ import databaseConfig, {
       isGlobal: true,
       cache: true,
       expandVariables: true,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, storageConfig],
       validationSchema: appValidationSchema
-        .concat(databaseValidationSchema),
+        .concat(databaseValidationSchema)
+        .concat(storageValidationSchema),
     }),
   ],
 })

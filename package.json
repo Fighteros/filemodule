@@ -38,11 +38,13 @@
     "joi": "^18.0.2",
     "multer": "^2.0.2",
     "mysql2": "^3.15.3",
+    "nanoid": "^5.1.6",
     "nest-winston": "^1.10.2",
     "nestjs-i18n": "^10.5.1",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "sanitize-filename": "^1.6.3",
     "typeorm": "^0.3.27",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"

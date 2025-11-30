@@ -1,19 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FilesController } from './files.controller';
-import { FilesService } from './files.service';
-import { TempFile } from './domain/entities/temp-file.entity';
-import { Outbox } from '../outbox/domain/entities/outbox.entity';
-import { StorageModule } from '../storage/storage.module';
+import { FilesController } from './controller/files.controller';
+import { File } from './entities/file.entity';
+import { TempFile } from './entities/temp-file.entity';
+import { FilesService } from './services/files.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TempFile, Outbox]),
-    StorageModule,
-  ],
+  imports: [TypeOrmModule.forFeature([File, TempFile])],
   controllers: [FilesController],
   providers: [FilesService],
   exports: [FilesService],
 })
 export class FilesModule {}
-

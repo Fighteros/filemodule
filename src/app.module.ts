@@ -15,8 +15,8 @@ import { ResponseInterceptor } from './core/interceptors/response/response.inter
 import { ValidationPipe } from './core/pipes/validation.pipe';
 import { DocsModule } from './docs/docs.module';
 import { DatabaseModule } from './modules/database/database.module';
+import { StorageModule } from './modules/storage/storage.module';
 import { FilesModule } from './modules/files/files.module';
-import { OutboxModule } from './modules/outbox/outbox.module';
 
 @Module({
   imports: [
@@ -39,8 +39,8 @@ import { OutboxModule } from './modules/outbox/outbox.module';
     ]),
 
     ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(process.cwd(), 'storage'),
+      serveRoot: '/storage',
     }),
 
     ConfigModule,
@@ -48,8 +48,8 @@ import { OutboxModule } from './modules/outbox/outbox.module';
     RequestContextModule,
     DocsModule,
     DatabaseModule,
+    StorageModule,
     FilesModule,
-    OutboxModule,
   ],
   providers: [
     {

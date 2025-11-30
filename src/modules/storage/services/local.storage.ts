@@ -16,11 +16,15 @@ export class LocalStorage implements IStorage {
   }
 
   /* save temp data buffer to baseDir/temp/<key> */
-  async saveToTemp(fileBuffer: Buffer, key: string): Promise<string> {
+  async saveToTemp(
+    fileBuffer: Buffer,
+    key: string,
+  ): Promise<{ path: string; physicalPath: string }> {
     const p = `/${this.baseDir}/temp/${key}`;
-    await fs.mkdir(dirname(p), { recursive: true });
-    await fs.writeFile(p, fileBuffer);
-    return p;
+    const pathUrl = join(this.tempDir, key);
+    await fs.mkdir(dirname(pathUrl), { recursive: true });
+    await fs.writeFile(pathUrl, fileBuffer);
+    return { path: p, physicalPath: pathUrl };
   }
 
   /* move file on disk */

@@ -8,7 +8,10 @@ export class File extends Base {
   originalName: string;
 
   @Column()
-  path: string;
+  path: string; // client path
+
+  @Column()
+  physicalPath: string; // storage path
 
   @Column({ type: 'bigint' })
   size: number;

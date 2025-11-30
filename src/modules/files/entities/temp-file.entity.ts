@@ -8,7 +8,10 @@ export class TempFile extends Base {
   originalName: string;
 
   @Column()
-  path: string; // storage path
+  path: string; // client path
+
+  @Column()
+  physicalPath: string; // storage path
 
   @Column({ type: 'bigint' })
   size: number;

@@ -30,11 +30,15 @@ export class FilesService {
     }[] = [];
     for (const f of files) {
       const key = this.storage.createSafeFilename(f.originalname);
-      const path = await this.storage.saveToTemp(f.buffer, key);
+      const { path, physicalPath } = await this.storage.saveToTemp(
+        f.buffer,
+        key,
+      );
       const expiresAt = addDays(new Date(), 1); /* 1 day */
       const temp = this.tempRepo.create({
         originalName: f.originalname,
         path,
+        physicalPath,
         size: f.size,
         mime: f.mimetype,
         expiresAt,
@@ -108,7 +112,7 @@ export class FilesService {
     }); /* adapt to TypeORM query builder */
     for (const t of expired) {
       try {
-        await this.storage.delete(t.path);
+        await this.storage.delete(t.physicalPath);
       } catch (e) {
         /* ignore for now */
       }
@@ -130,7 +134,7 @@ export class FilesService {
     if (!temp) {
       throw new NotFoundException('errors.notFound');
     }
-    await this.storage.delete(temp.path);
+    await this.storage.delete(temp.physicalPath);
     await this.tempRepo.delete({ id });
   }
 }

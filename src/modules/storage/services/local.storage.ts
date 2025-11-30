@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { promises as fs } from 'fs';
+import { createWriteStream, promises as fs } from 'fs';
 import { nanoid } from 'nanoid';
 import path, { dirname, join } from 'path';
 import sanitize from 'sanitize-filename';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import { IStorage } from '../interfaces/storage.interface';
 
 @Injectable()
@@ -23,12 +25,17 @@ export class LocalStorage implements IStorage {
     const p = `/${this.baseDir}/temp/${key}`;
     const pathUrl = join(this.tempDir, key);
     await fs.mkdir(dirname(pathUrl), { recursive: true });
-    await fs.writeFile(pathUrl, fileBuffer);
+    // await fs.writeFile(pathUrl, fileBuffer);
+    const ws = createWriteStream(pathUrl, { flags: 'w' });
+    await pipeline(Readable.from(Buffer.from(fileBuffer)), ws);
     return { path: p, physicalPath: pathUrl };
   }
 
   /* move file on disk */
-  async moveTempToFinal(tempPath: string, finalKey: string): Promise<{ path: string; physicalPath: string }> {
+  async moveTempToFinal(
+    tempPath: string,
+    finalKey: string,
+  ): Promise<{ path: string; physicalPath: string }> {
     const path = `/${this.baseDir}/files/${finalKey}`;
     const physicalPath = join(this.baseDir, 'files', finalKey);
     await fs.mkdir(dirname(physicalPath), { recursive: true });

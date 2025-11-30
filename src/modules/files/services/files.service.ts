@@ -27,6 +27,7 @@ export class FilesService {
       originalName: string;
       size: number;
       mime: string;
+      expiresAt: Date | null;
     }[] = [];
     for (const f of files) {
       const key = this.storage.createSafeFilename(f.originalname);
@@ -51,6 +52,7 @@ export class FilesService {
         originalName: f.originalname,
         size: f.size,
         mime: f.mimetype,
+        expiresAt: savedTemp.expiresAt,
       });
     }
     return created;
@@ -111,18 +113,21 @@ export class FilesService {
   }
 
   /* periodic cleanup for expired temp files */
-  async cleanupExpiredTemps() {
+  async cleanupExpiredTemps(): Promise<number> {
     const expired = await this.tempRepo.find({
       where: { expiresAt: LessThan(new Date()) },
     }); /* adapt to TypeORM query builder */
+    let deletedCount = 0;
     for (const t of expired) {
       try {
         await this.storage.delete(t.physicalPath);
+        await this.tempRepo.delete({ id: t.id });
+        deletedCount++;
       } catch (e) {
         /* ignore for now */
       }
-      await this.tempRepo.delete({ id: t.id });
     }
+    return deletedCount;
   }
 
   /* get signed url for permanent file (optional) */

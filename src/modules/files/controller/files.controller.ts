@@ -12,6 +12,8 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import { FilesService } from '../services/files.service';
+import { UploadFilesDto } from '../dto/upload-files.dto';
+import { FileDataDto } from '../dto/file-data.dto';
 
 @ApiTags('files')
 @Controller('files')
@@ -22,26 +24,17 @@ export class FilesController {
   @ApiOperation({ summary: 'Create temporary files' })
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        files: { type: 'array', items: { type: 'string', format: 'binary' } },
-      },
-      required: ['files'],
-    },
-  })
+  @ApiBody({ type: UploadFilesDto })
   async createTempFiles(
     @UploadedFiles()
     files: Array<Express.Multer.File>,
   ) {
-    return await this.filesService.createTempFiles(
-      files.map((file) => ({
-        buffer: file.buffer,
-        originalname: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size,
-      })),
-    );
+    const fileData: FileDataDto[] = files.map((file) => ({
+      buffer: file.buffer,
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+    }));
+    return await this.filesService.createTempFiles(fileData);
   }
 }

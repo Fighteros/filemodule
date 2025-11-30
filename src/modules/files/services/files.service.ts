@@ -1,6 +1,7 @@
 /* Main service to create temp files, commit them, and cleanup. */
 import { File } from '@/modules/files/entities/file.entity';
 import { TempFile } from '@/modules/files/entities/temp-file.entity';
+import { FileDataDto } from '@/modules/files/dto/file-data.dto';
 import { LocalStorage } from '@/modules/storage/services/local.storage';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,14 +20,7 @@ export class FilesService {
   ) {}
 
   /* Create temp file entries and store bytes in storage */
-  async createTempFiles(
-    files: {
-      buffer: Buffer;
-      originalname: string;
-      mimetype: string;
-      size: number;
-    }[],
-  ) {
+  async createTempFiles(files: FileDataDto[]) {
     const created: {
       id: string;
       url: string;

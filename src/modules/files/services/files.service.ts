@@ -1,9 +1,9 @@
 /* Main service to create temp files, commit them, and cleanup. */
+import { FileDataDto } from '@/modules/files/dto/file-data.dto';
 import { File } from '@/modules/files/entities/file.entity';
 import { TempFile } from '@/modules/files/entities/temp-file.entity';
-import { FileDataDto } from '@/modules/files/dto/file-data.dto';
 import { LocalStorage } from '@/modules/storage/services/local.storage';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addDays } from 'date-fns';
 import { DataSource, LessThan, Repository } from 'typeorm';
@@ -123,5 +123,14 @@ export class FilesService {
       return null;
     }
     return this.storage.getSignedUrl(file.path);
+  }
+
+  async deleteTempFile(id: string) {
+    const temp = await this.tempRepo.findOne({ where: { id } });
+    if (!temp) {
+      throw new NotFoundException('errors.notFound');
+    }
+    await this.storage.delete(temp.path);
+    await this.tempRepo.delete({ id });
   }
 }

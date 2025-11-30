@@ -1,6 +1,7 @@
 import {
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -42,6 +43,16 @@ export class FilesController {
       size: file.size,
     }));
     return await this.filesService.createTempFiles(fileData);
+  }
+
+  @Get('temp/:id')
+  @ApiOperation({ summary: 'Get temporary file' })
+  @ApiParam({
+    name: 'id',
+    description: 'The unique identifier of the temporary file',
+  })
+  async getTempFile(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.filesService.getTempFile(id);
   }
 
   @Delete('temp/:id')

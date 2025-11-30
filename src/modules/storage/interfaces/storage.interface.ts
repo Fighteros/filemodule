@@ -4,7 +4,7 @@ export interface IStorage {
   saveToTemp(fileBuffer: Buffer, key: string): Promise<{ path: string; physicalPath: string }>;
 
   /* Move a file from the temp storage to the final storage */
-  moveTempToFinal(tempPath: string, finalKey: string): Promise<string>;
+  moveTempToFinal(tempPath: string, finalKey: string): Promise<{ path: string; physicalPath: string }>;
 
   /* delete a path */
   delete(path: string): Promise<void>;

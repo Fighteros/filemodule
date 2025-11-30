@@ -28,11 +28,12 @@ export class LocalStorage implements IStorage {
   }
 
   /* move file on disk */
-  async moveTempToFinal(tempPath: string, finalKey: string): Promise<string> {
-    const finalPath = `/${this.baseDir}/files/${finalKey}`;
-    await fs.mkdir(dirname(finalPath), { recursive: true });
-    await fs.rename(tempPath, finalPath); /* atomic on same FS */
-    return finalPath;
+  async moveTempToFinal(tempPath: string, finalKey: string): Promise<{ path: string; physicalPath: string }> {
+    const path = `/${this.baseDir}/files/${finalKey}`;
+    const physicalPath = join(this.baseDir, 'files', finalKey);
+    await fs.mkdir(dirname(physicalPath), { recursive: true });
+    await fs.rename(tempPath, physicalPath); /* atomic on same FS */
+    return { path, physicalPath };
   }
 
   async delete(path: string): Promise<void> {

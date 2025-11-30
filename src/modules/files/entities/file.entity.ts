@@ -19,12 +19,6 @@ export class File extends Base {
   @Column()
   mime: string;
 
-  @Column()
-  ownerType: string; // e.g. 'order'
-
-  @Column({ type: 'uuid' })
-  ownerId: string;
-
   @Column({ type: 'jsonb', nullable: true })
   meta?: any;
 }

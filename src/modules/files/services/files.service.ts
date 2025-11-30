@@ -6,7 +6,7 @@ import { LocalStorage } from '@/modules/storage/services/local.storage';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addDays } from 'date-fns';
-import { DataSource, LessThan, Repository } from 'typeorm';
+import { DataSource, In, LessThan, Repository } from 'typeorm';
 
 @Injectable()
 export class FilesService {
@@ -55,7 +55,6 @@ export class FilesService {
     }
     return created;
   }
-
   /* Attach a list of temp IDs to a new owner (within a transaction) */
   async commitFilesToOwner(
     ownerType: string,
@@ -67,20 +66,26 @@ export class FilesService {
     await queryRunner.startTransaction();
 
     try {
-      const temps = await queryRunner.manager.findByIds(TempFile, tempIds);
+      const temps = await queryRunner.manager.find(TempFile, {
+        where: { id: In(tempIds) },
+      });
       /* validate all found */
       if (temps.length !== tempIds.length) {
-        throw new Error('Some temp files not found');
+        throw new NotFoundException('errors.notFound');
       }
 
       const resultFiles: File[] = [];
       for (const t of temps) {
-        const finalKey = `${ownerType}/${ownerId}/${t.id}-${t.originalName}`;
-        const finalPath = await this.storage.moveTempToFinal(t.path, finalKey);
+        const finalKey = `${ownerType}/${ownerId}/${this.storage.createSafeFilename(t.originalName)}`;
+        const finalPath = await this.storage.moveTempToFinal(
+          t.physicalPath,
+          finalKey,
+        );
 
         const fileEntity = queryRunner.manager.create(File, {
           originalName: t.originalName,
-          path: finalPath,
+          path: finalPath.path,
+          physicalPath: finalPath.physicalPath,
           size: t.size,
           mime: t.mime,
           ownerType,
@@ -127,6 +132,14 @@ export class FilesService {
       return null;
     }
     return this.storage.getSignedUrl(file.path);
+  }
+
+  async getTempFile(id: string) {
+    const temp = await this.tempRepo.findOne({ where: { id } });
+    if (!temp) {
+      throw new NotFoundException('errors.notFound');
+    }
+    return { url: await this.storage.getSignedUrl(temp.path) };
   }
 
   async deleteTempFile(id: string) {
